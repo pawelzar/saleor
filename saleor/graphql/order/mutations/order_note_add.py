@@ -16,7 +16,7 @@ from ..types import Order, OrderEvent
 from .utils import get_webhook_handler_by_order_status
 
 
-class OrderAddNoteInput(BaseInputObjectType):
+class OrderNoteAddInput(BaseInputObjectType):
     message = graphene.String(
         description="Note message.", name="message", required=True
     )
@@ -25,7 +25,7 @@ class OrderAddNoteInput(BaseInputObjectType):
         doc_category = DOC_CATEGORY_ORDERS
 
 
-class OrderAddNote(BaseMutation):
+class OrderNoteAdd(BaseMutation):
     order = graphene.Field(Order, description="Order with the note added.")
     event = graphene.Field(OrderEvent, description="Order note created.")
 
@@ -35,7 +35,7 @@ class OrderAddNote(BaseMutation):
             description="ID of the order to add a note for.",
             name="order",
         )
-        input = OrderAddNoteInput(
+        input = OrderNoteAddInput(
             required=True, description="Fields required to create a note for the order."
         )
 
@@ -79,4 +79,4 @@ class OrderAddNote(BaseMutation):
             )
             func = get_webhook_handler_by_order_status(order.status, manager)
             cls.call_event(func, order)
-        return OrderAddNote(order=order, event=event)
+        return OrderNoteAdd(order=order, event=event)
