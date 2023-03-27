@@ -48,6 +48,7 @@ from .mutations.order_line_update import OrderLineUpdate
 from .mutations.order_lines_create import OrderLinesCreate
 from .mutations.order_mark_as_paid import OrderMarkAsPaid
 from .mutations.order_note_add import OrderNoteAdd
+from .mutations.order_note_update import OrderNoteUpdate
 from .mutations.order_refund import OrderRefund
 from .mutations.order_update import OrderUpdate
 from .mutations.order_update_shipping import OrderUpdateShipping
@@ -249,6 +250,7 @@ class OrderMutations(graphene.ObjectType):
         deprecation_reason=(f"{DEPRECATED_IN_3X_FIELD} Use `orderNoteAdd` instead.")
     )
     order_note_add = OrderNoteAdd.Field()
+    order_note_update = OrderNoteUpdate.Field()
 
     order_mark_as_paid = OrderMarkAsPaid.Field()
     order_refund = OrderRefund.Field()

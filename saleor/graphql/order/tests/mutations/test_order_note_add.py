@@ -68,7 +68,7 @@ def test_order_note_add_as_staff_user(
     assert event.user == staff_user
     assert event.parameters == {"message": message}
 
-    # Ensure not customer events were created as it was a staff action
+    # Ensure no customer events were created as it was a staff action
     assert not CustomerEvent.objects.exists()
 
 
