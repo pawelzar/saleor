@@ -14903,6 +14903,16 @@ type Mutation {
   ): OrderNoteAdd @doc(category: "Orders")
 
   """
+  Removes note from an order. 
+  
+  Requires one of the following permissions: MANAGE_ORDERS.
+  """
+  orderNoteRemove(
+    """ID of the note."""
+    note: ID!
+  ): OrderNoteRemove @doc(category: "Orders")
+
+  """
   Updates note of an order. 
   
   Requires one of the following permissions: MANAGE_ORDERS.
@@ -22279,6 +22289,18 @@ type OrderNoteAdd @doc(category: "Orders") {
 input OrderNoteInput @doc(category: "Orders") {
   """Note message."""
   message: String!
+}
+
+"""
+Removes note from an order. 
+
+Requires one of the following permissions: MANAGE_ORDERS.
+"""
+type OrderNoteRemove @doc(category: "Orders") {
+  """Order with the note removed."""
+  order: Order
+  orderErrors: [OrderError!]! @deprecated(reason: "This field will be removed in Saleor 4.0. Use `errors` field instead.")
+  errors: [OrderError!]!
 }
 
 """
