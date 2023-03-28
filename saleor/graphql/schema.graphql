@@ -14886,7 +14886,7 @@ type Mutation {
     order: ID!
 
     """Fields required to create a note for the order."""
-    input: OrderNoteAddInput!
+    input: OrderNoteInput!
   ): OrderNoteAdd @doc(category: "Orders") @deprecated(reason: "This field will be removed in Saleor 4.0. Use `orderNoteAdd` instead.")
 
   """
@@ -14899,7 +14899,7 @@ type Mutation {
     order: ID!
 
     """Fields required to create a note for the order."""
-    input: OrderNoteAddInput!
+    input: OrderNoteInput!
   ): OrderNoteAdd @doc(category: "Orders")
 
   """
@@ -14912,7 +14912,7 @@ type Mutation {
     note: ID!
 
     """Fields required to create a note for the order."""
-    input: OrderNoteUpdateInput!
+    input: OrderNoteInput!
   ): OrderNoteUpdate @doc(category: "Orders")
 
   """
@@ -22276,7 +22276,7 @@ type OrderNoteAdd @doc(category: "Orders") {
   errors: [OrderError!]!
 }
 
-input OrderNoteAddInput @doc(category: "Orders") {
+input OrderNoteInput @doc(category: "Orders") {
   """Note message."""
   message: String!
 }
@@ -22287,18 +22287,13 @@ Updates note of an order.
 Requires one of the following permissions: MANAGE_ORDERS.
 """
 type OrderNoteUpdate @doc(category: "Orders") {
-  """Order with the note updated."""
+  """Order with the note added."""
   order: Order
 
-  """Order note updated."""
+  """Order note created."""
   event: OrderEvent
   orderErrors: [OrderError!]! @deprecated(reason: "This field will be removed in Saleor 4.0. Use `errors` field instead.")
   errors: [OrderError!]!
-}
-
-input OrderNoteUpdateInput @doc(category: "Orders") {
-  """Note message."""
-  message: String!
 }
 
 """
