@@ -64,6 +64,9 @@ All notable, unreleased changes to this project will be documented in this file.
       - `transactionEventReport` - Report the event for the transaction.
       - `orderGrantRefundCreate` - Add granted refund to the order.
       - `orderGrantRefundUpdate` - Update granted refund.
+      - `orderNoteAdd` - Add a note to the order.
+      - `orderNoteRemove` - Remove a note from the order.
+      - `orderNoteUpdate` - Update a note of the order.
     - Add new types:
       - `OrderGrantedRefund` - The details of the granted refund.
     - Add new webhooks:
@@ -142,7 +145,8 @@ All notable, unreleased changes to this project will be documented in this file.
       - `OrderEventsEnum`:
         - `TRANSACTION_CAPTURE_REQUESTED` - Use `TRANSACTION_CHARGE_REQUESTED` instead. This field will be removed in Saleor 3.14 (Preview feature).
         - `TRANSACTION_VOID_REQUESTED` - Use `TRANSACTION_CANCEL_REQUESTED` instead. This field will be removed in Saleor 3.14 (Preview feature).
-
+    - Deprecate mutations:
+      - `orderAddNote` - Use `orderNoteAdd` instead. This mutation will be removed in Saleor 4.0.
     - Deprecate input fields:
       - `TransactionCreateInput` & `TransactionUpdateInput`:
         - `status` - Not needed anymore. The transaction amounts will be used to determine the current status of transactions. This input field will be removed in Saleor 3.14 (Preview feature).
@@ -187,6 +191,7 @@ All notable, unreleased changes to this project will be documented in this file.
 - Support resolving `Order` as an entity in Apollo Federation - #12328 by @binary-koan
 - [Preview] Add `ProductBulkCreate` mutation - #12177 by @SzymJ
 - [Preview] Add `CustomerBulkUpdate` mutation - #12268 by @SzymJ
+- Add mutations to update and remove order note - #12434 by @pawelzar
 
 ### Saleor Apps
 
