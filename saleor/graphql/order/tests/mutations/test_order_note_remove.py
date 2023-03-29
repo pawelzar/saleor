@@ -77,3 +77,16 @@ def test_order_note_remove_fail_on_wrong_id(
     order_updated_webhook_mock.assert_not_called()
 
     assert OrderEvent.objects.filter(pk=note.pk).exists()
+
+
+def test_order_note_remove_fail_on_missing_permission(staff_api_client, order):
+    note = OrderEvent.objects.create(order=order, type=OrderEvents.NOTE_ADDED)
+    note_id = graphene.Node.to_global_id("OrderEvent", note.pk)
+    variables = {"id": note_id}
+    response = staff_api_client.post_graphql(ORDER_NOTE_REMOVE_MUTATION, variables)
+    content = get_graphql_content(response, ignore_errors=True)
+    assert len(content["errors"]) == 1
+    assert (
+        content["errors"][0]["message"]
+        == "You need one of the following permissions: MANAGE_ORDERS"
+    )

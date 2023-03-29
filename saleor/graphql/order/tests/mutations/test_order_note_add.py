@@ -90,13 +90,7 @@ def test_order_note_add_fail_on_empty_message(
     permission_group_manage_orders.user_set.add(staff_api_client.user)
     order_id = graphene.Node.to_global_id("Order", order_with_lines.id)
     variables = {"id": order_id, "message": message}
-<<<<<<< HEAD:saleor/graphql/order/tests/mutations/test_order_add_note.py
-    response = staff_api_client.post_graphql(ORDER_ADD_NOTE_MUTATION, variables)
-=======
-    response = staff_api_client.post_graphql(
-        ORDER_NOTE_ADD_MUTATION, variables, permissions=[permission_manage_orders]
-    )
->>>>>>> 2ed8f3eec (Rename orderAddNote mutation to orderNoteAdd):saleor/graphql/order/tests/mutations/test_order_note_add.py
+    response = staff_api_client.post_graphql(ORDER_NOTE_ADD_MUTATION, variables)
     content = get_graphql_content(response)
     data = content["data"]["orderNoteAdd"]
     assert data["errors"][0]["field"] == "message"
@@ -122,7 +116,7 @@ def test_order_add_note_as_user_no_channel_access(
     variables = {"id": order_id, "message": message}
 
     # when
-    response = staff_api_client.post_graphql(ORDER_ADD_NOTE_MUTATION, variables)
+    response = staff_api_client.post_graphql(ORDER_NOTE_ADD_MUTATION, variables)
 
     # then
     assert_no_permission(response)
@@ -144,7 +138,7 @@ def test_order_add_note_by_app(
 
     # when
     response = app_api_client.post_graphql(
-        ORDER_ADD_NOTE_MUTATION, variables, permissions=(permission_manage_orders,)
+        ORDER_NOTE_ADD_MUTATION, variables, permissions=(permission_manage_orders,)
     )
 
     # then
@@ -156,3 +150,15 @@ def test_order_add_note_by_app(
     assert data["event"]["app"]["name"] == app_api_client.app.name
     assert data["event"]["message"] == message
     order_updated_webhook_mock.assert_called_once_with(order)
+
+
+def test_order_note_add_fail_on_missing_permission(staff_api_client, order):
+    order_id = graphene.Node.to_global_id("Order", order.id)
+    variables = {"id": order_id, "message": "a note"}
+    response = staff_api_client.post_graphql(ORDER_NOTE_ADD_MUTATION, variables)
+    content = get_graphql_content(response, ignore_errors=True)
+    assert len(content["errors"]) == 1
+    assert (
+        content["errors"][0]["message"]
+        == "You need one of the following permissions: MANAGE_ORDERS"
+    )
