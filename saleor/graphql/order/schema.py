@@ -222,6 +222,9 @@ class OrderMutations(graphene.ObjectType):
     )
     draft_order_update = DraftOrderUpdate.Field()
 
+    order_add_note = OrderAddNote.Field(
+        deprecation_reason=(f"{DEPRECATED_IN_3X_FIELD} Use `orderNoteAdd` instead.")
+    )
     order_cancel = OrderCancel.Field()
     order_capture = OrderCapture.Field()
     order_confirm = OrderConfirm.Field()
@@ -247,9 +250,6 @@ class OrderMutations(graphene.ObjectType):
     order_line_discount_update = OrderLineDiscountUpdate.Field()
     order_line_discount_remove = OrderLineDiscountRemove.Field()
 
-    order_add_note = OrderAddNote.Field(
-        deprecation_reason=(f"{DEPRECATED_IN_3X_FIELD} Use `orderNoteAdd` instead.")
-    )
     order_note_add = OrderNoteAdd.Field()
     order_note_remove = OrderNoteRemove.Field()
     order_note_update = OrderNoteUpdate.Field()

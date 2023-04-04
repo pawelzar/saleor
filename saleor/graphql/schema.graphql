@@ -14637,6 +14637,19 @@ type Mutation {
   ): DraftOrderUpdate @doc(category: "Orders")
 
   """
+  Adds note to the order. 
+  
+  Requires one of the following permissions: MANAGE_ORDERS.
+  """
+  orderAddNote(
+    """ID of the order to add a note for."""
+    order: ID!
+
+    """Fields required to create a note for the order."""
+    input: OrderNoteInput!
+  ): OrderAddNote @doc(category: "Orders") @deprecated(reason: "This field will be removed in Saleor 4.0. Use `orderNoteAdd` instead.")
+
+  """
   Cancel an order. 
   
   Requires one of the following permissions: MANAGE_ORDERS.
@@ -14880,19 +14893,6 @@ type Mutation {
     """ID of a order line to remove its discount"""
     orderLineId: ID!
   ): OrderLineDiscountRemove @doc(category: "Orders")
-
-  """
-  Adds note to the order. 
-  
-  Requires one of the following permissions: MANAGE_ORDERS.
-  """
-  orderAddNote(
-    """ID of the order to add a note for."""
-    order: ID!
-
-    """Fields required to create a note for the order."""
-    input: OrderNoteInput!
-  ): OrderAddNote @doc(category: "Orders") @deprecated(reason: "This field will be removed in Saleor 4.0. Use `orderNoteAdd` instead.")
 
   """
   Adds note to the order.
@@ -21809,6 +21809,26 @@ input DraftOrderInput @doc(category: "Orders") {
 }
 
 """
+Adds note to the order. 
+
+Requires one of the following permissions: MANAGE_ORDERS.
+"""
+type OrderAddNote @doc(category: "Orders") {
+  """Order with the note added."""
+  order: Order
+
+  """Order note created."""
+  event: OrderEvent
+  orderErrors: [OrderError!]! @deprecated(reason: "This field will be removed in Saleor 4.0. Use `errors` field instead.")
+  errors: [OrderError!]!
+}
+
+input OrderNoteInput @doc(category: "Orders") {
+  """Note message."""
+  message: String!
+}
+
+"""
 Cancel an order. 
 
 Requires one of the following permissions: MANAGE_ORDERS.
@@ -22286,26 +22306,6 @@ type OrderLineDiscountRemove @doc(category: "Orders") {
   order: Order
   orderErrors: [OrderError!]! @deprecated(reason: "This field will be removed in Saleor 4.0. Use `errors` field instead.")
   errors: [OrderError!]!
-}
-
-"""
-Adds note to the order. 
-
-Requires one of the following permissions: MANAGE_ORDERS.
-"""
-type OrderAddNote @doc(category: "Orders") {
-  """Order with the note added."""
-  order: Order
-
-  """Order note created."""
-  event: OrderEvent
-  orderErrors: [OrderError!]! @deprecated(reason: "This field will be removed in Saleor 4.0. Use `errors` field instead.")
-  errors: [OrderError!]!
-}
-
-input OrderNoteInput @doc(category: "Orders") {
-  """Note message."""
-  message: String!
 }
 
 """
