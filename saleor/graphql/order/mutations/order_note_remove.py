@@ -7,6 +7,7 @@ from ....order.error_codes import OrderErrorCode
 from ....permission.enums import OrderPermissions
 from ...app.dataloaders import get_app_promise
 from ...core import ResolveInfo
+from ...core.descriptions import ADDED_IN_313, PREVIEW_FEATURE
 from ...core.doc_category import DOC_CATEGORY_ORDERS
 from ...core.types import OrderError
 from ...plugins.dataloaders import get_plugin_manager_promise
@@ -24,7 +25,7 @@ class OrderNoteRemove(OrderNoteCommon):
         )
 
     class Meta:
-        description = "Removes note from an order."
+        description = "Removes note from an order." + ADDED_IN_313 + PREVIEW_FEATURE
         doc_category = DOC_CATEGORY_ORDERS
         permissions = (OrderPermissions.MANAGE_ORDERS,)
         error_type_class = OrderError

@@ -5,6 +5,7 @@ from ....order import events
 from ....permission.enums import OrderPermissions
 from ...app.dataloaders import get_app_promise
 from ...core import ResolveInfo
+from ...core.descriptions import ADDED_IN_313, PREVIEW_FEATURE
 from ...core.doc_category import DOC_CATEGORY_ORDERS
 from ...core.types import OrderError
 from ...plugins.dataloaders import get_plugin_manager_promise
@@ -22,11 +23,10 @@ class OrderNoteAdd(OrderNoteCommon):
         )
 
     class Meta:
-        description = "Adds note to the order."
+        description = "Adds note to the order." + ADDED_IN_313 + PREVIEW_FEATURE
         doc_category = DOC_CATEGORY_ORDERS
         permissions = (OrderPermissions.MANAGE_ORDERS,)
         error_type_class = OrderError
-        error_type_field = "order_errors"
 
     @classmethod
     def perform_mutation(  # type: ignore[override]
@@ -47,3 +47,12 @@ class OrderNoteAdd(OrderNoteCommon):
             func = get_webhook_handler_by_order_status(order.status, manager)
             cls.call_event(func, order)
         return OrderNoteAdd(order=order, event=event)
+
+
+class OrderAddNote(OrderNoteAdd):
+    class Meta:
+        description = "Adds note to the order."
+        doc_category = DOC_CATEGORY_ORDERS
+        permissions = (OrderPermissions.MANAGE_ORDERS,)
+        error_type_class = OrderError
+        error_type_field = "order_errors"

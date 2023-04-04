@@ -14892,10 +14892,14 @@ type Mutation {
 
     """Fields required to create a note for the order."""
     input: OrderNoteInput!
-  ): OrderNoteAdd @doc(category: "Orders") @deprecated(reason: "This field will be removed in Saleor 4.0. Use `orderNoteAdd` instead.")
+  ): OrderAddNote @doc(category: "Orders") @deprecated(reason: "This field will be removed in Saleor 4.0. Use `orderNoteAdd` instead.")
 
   """
-  Adds note to the order. 
+  Adds note to the order.
+  
+  Added in Saleor 3.13.
+  
+  Note: this API is currently in Feature Preview and can be subject to changes at later point. 
   
   Requires one of the following permissions: MANAGE_ORDERS.
   """
@@ -14908,7 +14912,11 @@ type Mutation {
   ): OrderNoteAdd @doc(category: "Orders")
 
   """
-  Removes note from an order. 
+  Removes note from an order.
+  
+  Added in Saleor 3.13.
+  
+  Note: this API is currently in Feature Preview and can be subject to changes at later point. 
   
   Requires one of the following permissions: MANAGE_ORDERS.
   """
@@ -14918,7 +14926,11 @@ type Mutation {
   ): OrderNoteRemove @doc(category: "Orders")
 
   """
-  Updates note of an order. 
+  Updates note of an order.
+  
+  Added in Saleor 3.13.
+  
+  Note: this API is currently in Feature Preview and can be subject to changes at later point. 
   
   Requires one of the following permissions: MANAGE_ORDERS.
   """
@@ -22281,7 +22293,7 @@ Adds note to the order.
 
 Requires one of the following permissions: MANAGE_ORDERS.
 """
-type OrderNoteAdd @doc(category: "Orders") {
+type OrderAddNote @doc(category: "Orders") {
   """Order with the note added."""
   order: Order
 
@@ -22297,7 +22309,29 @@ input OrderNoteInput @doc(category: "Orders") {
 }
 
 """
-Removes note from an order. 
+Adds note to the order.
+
+Added in Saleor 3.13.
+
+Note: this API is currently in Feature Preview and can be subject to changes at later point. 
+
+Requires one of the following permissions: MANAGE_ORDERS.
+"""
+type OrderNoteAdd @doc(category: "Orders") {
+  """Order with the note added."""
+  order: Order
+
+  """Order note created."""
+  event: OrderEvent
+  errors: [OrderError!]!
+}
+
+"""
+Removes note from an order.
+
+Added in Saleor 3.13.
+
+Note: this API is currently in Feature Preview and can be subject to changes at later point. 
 
 Requires one of the following permissions: MANAGE_ORDERS.
 """
@@ -22311,7 +22345,11 @@ type OrderNoteRemove @doc(category: "Orders") {
 }
 
 """
-Updates note of an order. 
+Updates note of an order.
+
+Added in Saleor 3.13.
+
+Note: this API is currently in Feature Preview and can be subject to changes at later point. 
 
 Requires one of the following permissions: MANAGE_ORDERS.
 """
