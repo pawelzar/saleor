@@ -705,6 +705,35 @@ def order_note_added_event(
     )
 
 
+def order_note_updated_event(
+    *,
+    order: Order,
+    user: Optional[User],
+    app: Optional[App],
+    message: str,
+    related_event_pk: int
+) -> OrderEvent:
+    return OrderEvent.objects.create(
+        order=order,
+        type=OrderEvents.NOTE_UPDATED,
+        parameters={"message": message, "related_event_pk": related_event_pk},
+        app=app,
+        user=user,
+    )
+
+
+def order_note_removed_event(
+    *, order: Order, user: Optional[User], app: Optional[App], related_event_pk: int
+) -> OrderEvent:
+    return OrderEvent.objects.create(
+        order=order,
+        type=OrderEvents.NOTE_REMOVED,
+        parameters={"related_event_pk": related_event_pk},
+        app=app,
+        user=user,
+    )
+
+
 def _prepare_discount_object(
     order_discount: "OrderDiscount",
     old_order_discount: Optional["OrderDiscount"] = None,

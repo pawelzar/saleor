@@ -11055,6 +11055,9 @@ type OrderEvent implements Node @doc(category: "Orders") {
   """The order which is related to this order."""
   relatedOrder: Order
 
+  """The order event which is related to this event."""
+  relatedOrderEvent: OrderEvent
+
   """The discount applied to the order."""
   discount: OrderEventDiscountObject
 
@@ -11124,6 +11127,8 @@ enum OrderEventsEnum @doc(category: "Orders") {
   FULFILLMENT_AWAITS_APPROVAL
   TRACKING_UPDATED
   NOTE_ADDED
+  NOTE_UPDATED
+  NOTE_REMOVED
   OTHER
 }
 
@@ -22297,9 +22302,11 @@ Removes note from an order.
 Requires one of the following permissions: MANAGE_ORDERS.
 """
 type OrderNoteRemove @doc(category: "Orders") {
-  """Order with the note removed."""
+  """Order with the note added."""
   order: Order
-  orderErrors: [OrderError!]! @deprecated(reason: "This field will be removed in Saleor 4.0. Use `errors` field instead.")
+
+  """Order note created."""
+  event: OrderEvent
   errors: [OrderError!]!
 }
 
@@ -22314,7 +22321,6 @@ type OrderNoteUpdate @doc(category: "Orders") {
 
   """Order note created."""
   event: OrderEvent
-  orderErrors: [OrderError!]! @deprecated(reason: "This field will be removed in Saleor 4.0. Use `errors` field instead.")
   errors: [OrderError!]!
 }
 

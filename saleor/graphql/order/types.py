@@ -340,6 +340,10 @@ class OrderEvent(ModelObjectType[models.OrderEvent]):
     related_order = graphene.Field(
         lambda: Order, description="The order which is related to this order."
     )
+    related_order_event = graphene.Field(
+        lambda: OrderEvent,
+        description="The order event which is related to this event.",
+    )
     discount = graphene.Field(
         OrderEventDiscountObject, description="The discount applied to the order."
     )
@@ -519,6 +523,14 @@ class OrderEvent(ModelObjectType[models.OrderEvent]):
             return OrderByNumberLoader(info.context).load(order_pk_or_number)
 
         return OrderByIdLoader(info.context).load(order_pk)
+
+    @staticmethod
+    def resolve_related_order_event(root: models.OrderEvent, info):
+        order_event_pk = root.parameters.get("related_event_pk")
+        if not order_event_pk:
+            return None
+
+        return models.OrderEvent.objects.filter(pk=order_event_pk).first()
 
     @staticmethod
     def resolve_discount(root: models.OrderEvent, info):

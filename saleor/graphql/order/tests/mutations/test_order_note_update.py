@@ -7,7 +7,7 @@ from .....account.models import CustomerEvent
 from .....order import OrderEvents, OrderStatus
 from .....order.error_codes import OrderErrorCode
 from .....order.models import OrderEvent
-from ....tests.utils import get_graphql_content
+from ....tests.utils import assert_no_permission, get_graphql_content
 
 ORDER_NOTE_UPDATE_MUTATION = """
     mutation updateNote($id: ID!, $message: String!) {
@@ -26,6 +26,9 @@ ORDER_NOTE_UPDATE_MUTATION = """
                     email
                 }
                 message
+                relatedOrderEvent {
+                    id
+                }
             }
         }
     }
@@ -40,6 +43,7 @@ def test_order_note_update_as_staff_user(
     order,
     staff_user,
 ):
+    # given
     parameters = {"message": "a note"}
     note = OrderEvent.objects.create(
         order=order,
@@ -52,25 +56,30 @@ def test_order_note_update_as_staff_user(
 
     message = "nuclear note"
     variables = {"id": note_id, "message": message}
+
+    # when
     response = staff_api_client.post_graphql(
         ORDER_NOTE_UPDATE_MUTATION, variables, permissions=[permission_manage_orders]
     )
+
+    # then
     content = get_graphql_content(response)
     data = content["data"]["orderNoteUpdate"]
 
     assert data["order"]["id"] == order_id
-    assert data["event"]["id"] == note_id
     assert data["event"]["user"]["email"] == staff_user.email
     assert data["event"]["message"] == message
+    assert data["event"]["relatedOrderEvent"]["id"] == note_id
     order_updated_webhook_mock.assert_called_once_with(order)
 
     order.refresh_from_db()
     assert order.status == OrderStatus.UNFULFILLED
 
-    note.refresh_from_db()
-    assert note.type == OrderEvents.NOTE_ADDED
-    assert note.user == staff_user
-    assert note.parameters == {"message": message}
+    assert OrderEvent.objects.filter(order=order).count() == 2
+    new_note = OrderEvent.objects.filter(order=order).exclude(pk=note.pk).get()
+    assert new_note.type == OrderEvents.NOTE_UPDATED
+    assert new_note.user == staff_user
+    assert new_note.parameters == {"message": message, "related_event_pk": note.pk}
 
     # Ensure no customer events were created as it was a staff action
     assert not CustomerEvent.objects.exists()
@@ -91,15 +100,20 @@ def test_order_note_update_fail_on_empty_message(
     order,
     message,
 ):
+    # given
     note = OrderEvent.objects.create(
         order=order,
         type=OrderEvents.NOTE_ADDED,
     )
     note_id = graphene.Node.to_global_id("OrderEvent", note.pk)
     variables = {"id": note_id, "message": message}
+
+    # when
     response = staff_api_client.post_graphql(
         ORDER_NOTE_UPDATE_MUTATION, variables, permissions=[permission_manage_orders]
     )
+
+    # then
     content = get_graphql_content(response)
     data = content["data"]["orderNoteUpdate"]
     assert data["errors"][0]["field"] == "message"
@@ -114,15 +128,20 @@ def test_order_note_update_fail_on_wrong_id(
     permission_manage_orders,
     order,
 ):
+    # given
     note = OrderEvent.objects.create(
         order=order,
         type=OrderEvents.UPDATED_ADDRESS,  # add different event type than NOTE_ADDED
     )
     note_id = graphene.Node.to_global_id("OrderEvent", note.pk)
     variables = {"id": note_id, "message": "test"}
+
+    # when
     response = staff_api_client.post_graphql(
         ORDER_NOTE_UPDATE_MUTATION, variables, permissions=[permission_manage_orders]
     )
+
+    # then
     content = get_graphql_content(response)
     data = content["data"]["orderNoteUpdate"]
     assert data["errors"][0]["field"] == "id"
@@ -131,13 +150,13 @@ def test_order_note_update_fail_on_wrong_id(
 
 
 def test_order_note_remove_fail_on_missing_permission(staff_api_client, order):
+    # given
     note = OrderEvent.objects.create(order=order, type=OrderEvents.NOTE_ADDED)
     note_id = graphene.Node.to_global_id("OrderEvent", note.pk)
     variables = {"id": note_id, "message": "test"}
+
+    # when
     response = staff_api_client.post_graphql(ORDER_NOTE_UPDATE_MUTATION, variables)
-    content = get_graphql_content(response, ignore_errors=True)
-    assert len(content["errors"]) == 1
-    assert (
-        content["errors"][0]["message"]
-        == "You need one of the following permissions: MANAGE_ORDERS"
-    )
+
+    # then
+    assert_no_permission(response)

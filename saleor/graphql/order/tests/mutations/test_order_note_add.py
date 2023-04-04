@@ -44,13 +44,18 @@ def test_order_note_add_as_staff_user(
 ):
     """We are testing that adding a note to an order as a staff user is doing the
     expected behaviors."""
+    # given
     permission_group_manage_orders.user_set.add(staff_api_client.user)
     order = order_with_lines
     assert not order.events.all()
     order_id = graphene.Node.to_global_id("Order", order.id)
     message = "nuclear note"
     variables = {"id": order_id, "message": message}
+
+    # when
     response = staff_api_client.post_graphql(ORDER_NOTE_ADD_MUTATION, variables)
+
+    # then
     content = get_graphql_content(response)
     data = content["data"]["orderNoteAdd"]
 
@@ -87,10 +92,15 @@ def test_order_note_add_fail_on_empty_message(
     order_with_lines,
     message,
 ):
+    # given
     permission_group_manage_orders.user_set.add(staff_api_client.user)
     order_id = graphene.Node.to_global_id("Order", order_with_lines.id)
     variables = {"id": order_id, "message": message}
+
+    # when
     response = staff_api_client.post_graphql(ORDER_NOTE_ADD_MUTATION, variables)
+
+    # then
     content = get_graphql_content(response)
     data = content["data"]["orderNoteAdd"]
     assert data["errors"][0]["field"] == "message"
@@ -153,12 +163,12 @@ def test_order_add_note_by_app(
 
 
 def test_order_note_add_fail_on_missing_permission(staff_api_client, order):
+    # given
     order_id = graphene.Node.to_global_id("Order", order.id)
     variables = {"id": order_id, "message": "a note"}
+
+    # when
     response = staff_api_client.post_graphql(ORDER_NOTE_ADD_MUTATION, variables)
-    content = get_graphql_content(response, ignore_errors=True)
-    assert len(content["errors"]) == 1
-    assert (
-        content["errors"][0]["message"]
-        == "You need one of the following permissions: MANAGE_ORDERS"
-    )
+
+    # then
+    assert_no_permission(response)

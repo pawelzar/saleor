@@ -1,8 +1,9 @@
 import graphene
 
 from ....core.tracing import traced_atomic_transaction
-from ....order import OrderEvents
+from ....order import OrderEvents, events, models
 from ....permission.enums import OrderPermissions
+from ...app.dataloaders import get_app_promise
 from ...core import ResolveInfo
 from ...core.doc_category import DOC_CATEGORY_ORDERS
 from ...core.types import OrderError
@@ -25,20 +26,25 @@ class OrderNoteUpdate(OrderNoteCommon):
         doc_category = DOC_CATEGORY_ORDERS
         permissions = (OrderPermissions.MANAGE_ORDERS,)
         error_type_class = OrderError
-        error_type_field = "order_errors"
 
     @classmethod
     def perform_mutation(  # type: ignore[override]
         cls, _root, info: ResolveInfo, /, *, id: str, input
     ):
-        qs = OrderEvent.get_model().objects.filter(type=OrderEvents.NOTE_ADDED)
+        qs = models.OrderEvent.objects.filter(type=OrderEvents.NOTE_ADDED)
         order_event = cls.get_node_or_error(info, id, only_type=OrderEvent, qs=qs)
         order = order_event.order
         cleaned_input = cls.clean_input(info, order, input)
+        app = get_app_promise(info.context).get()
         manager = get_plugin_manager_promise(info.context).get()
         with traced_atomic_transaction():
-            order_event.parameters["message"] = cleaned_input["message"]
-            order_event.save()
+            event = events.order_note_updated_event(
+                order=order,
+                user=info.context.user,
+                app=app,
+                message=cleaned_input["message"],
+                related_event_pk=order_event.pk,
+            )
             func = get_webhook_handler_by_order_status(order.status, manager)
             cls.call_event(func, order)
-        return OrderNoteUpdate(order=order, event=order_event)
+        return OrderNoteUpdate(order=order, event=event)
