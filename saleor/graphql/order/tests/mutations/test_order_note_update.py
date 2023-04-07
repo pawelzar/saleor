@@ -85,6 +85,47 @@ def test_order_note_update_as_staff_user(
     assert not CustomerEvent.objects.exists()
 
 
+@patch("saleor.plugins.manager.PluginsManager.order_updated")
+def test_order_note_update_as_app(
+    order_updated_webhook_mock,
+    app_api_client,
+    permission_manage_orders,
+    order,
+    app,
+):
+    # given
+    parameters = {"message": "a note"}
+    note = OrderEvent.objects.create(
+        order=order,
+        type=OrderEvents.NOTE_ADDED,
+        parameters=parameters,
+    )
+    note_id = graphene.Node.to_global_id("OrderEvent", note.pk)
+    order_id = graphene.Node.to_global_id("Order", order.id)
+
+    message = "nuclear note"
+    variables = {"id": note_id, "message": message}
+
+    # when
+    response = app_api_client.post_graphql(
+        ORDER_NOTE_UPDATE_MUTATION, variables, permissions=[permission_manage_orders]
+    )
+
+    # then
+    content = get_graphql_content(response)
+    data = content["data"]["orderNoteUpdate"]
+
+    assert data["order"]["id"] == order_id
+    assert data["event"]["user"] is None
+    assert data["event"]["relatedOrderEvent"]["id"] == note_id
+    order_updated_webhook_mock.assert_called_once_with(order)
+
+    new_note = OrderEvent.objects.filter(order=order).exclude(pk=note.pk).get()
+    assert new_note.type == OrderEvents.NOTE_UPDATED
+    assert new_note.app == app
+    assert not new_note.user
+
+
 @pytest.mark.parametrize(
     "message",
     (
