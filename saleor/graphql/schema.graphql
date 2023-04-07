@@ -14637,7 +14637,9 @@ type Mutation {
   ): DraftOrderUpdate @doc(category: "Orders")
 
   """
-  Adds note to the order. 
+  Adds note to the order.
+  
+  DEPRECATED: this mutation will be removed in Saleor 4.0. 
   
   Requires one of the following permissions: MANAGE_ORDERS.
   """
@@ -21809,7 +21811,9 @@ input DraftOrderInput @doc(category: "Orders") {
 }
 
 """
-Adds note to the order. 
+Adds note to the order.
+
+DEPRECATED: this mutation will be removed in Saleor 4.0. 
 
 Requires one of the following permissions: MANAGE_ORDERS.
 """
