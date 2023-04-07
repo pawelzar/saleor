@@ -142,6 +142,7 @@ from .dataloaders import (
     FulfillmentsByOrderIdLoader,
     OrderByIdLoader,
     OrderByNumberLoader,
+    OrderEventsByIdLoader,
     OrderEventsByOrderIdLoader,
     OrderGrantedRefundsByOrderIdLoader,
     OrderLineByIdLoader,
@@ -529,8 +530,7 @@ class OrderEvent(ModelObjectType[models.OrderEvent]):
         order_event_pk = root.parameters.get("related_event_pk")
         if not order_event_pk:
             return None
-
-        return models.OrderEvent.objects.filter(pk=order_event_pk).first()
+        return OrderEventsByIdLoader(info.context).load(order_event_pk)
 
     @staticmethod
     def resolve_discount(root: models.OrderEvent, info):
