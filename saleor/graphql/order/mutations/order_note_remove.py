@@ -11,12 +11,15 @@ from ...core.descriptions import ADDED_IN_313, PREVIEW_FEATURE
 from ...core.doc_category import DOC_CATEGORY_ORDERS
 from ...core.types import OrderError
 from ...plugins.dataloaders import get_plugin_manager_promise
-from ..types import OrderEvent
+from ..types import Order, OrderEvent
 from .order_note_common import OrderNoteCommon
 from .utils import get_webhook_handler_by_order_status
 
 
 class OrderNoteRemove(OrderNoteCommon):
+    order = graphene.Field(Order, description="Order with the note removed.")
+    event = graphene.Field(OrderEvent, description="Order note removed.")
+
     class Arguments:
         id = graphene.ID(
             required=True,

@@ -22340,10 +22340,10 @@ Note: this API is currently in Feature Preview and can be subject to changes at 
 Requires one of the following permissions: MANAGE_ORDERS.
 """
 type OrderNoteRemove @doc(category: "Orders") {
-  """Order with the note added."""
+  """Order with the note removed."""
   order: Order
 
-  """Order note created."""
+  """Order note removed."""
   event: OrderEvent
   errors: [OrderError!]!
 }
@@ -22358,10 +22358,10 @@ Note: this API is currently in Feature Preview and can be subject to changes at 
 Requires one of the following permissions: MANAGE_ORDERS.
 """
 type OrderNoteUpdate @doc(category: "Orders") {
-  """Order with the note added."""
+  """Order with the note updated."""
   order: Order
 
-  """Order note created."""
+  """Order note updated."""
   event: OrderEvent
   errors: [OrderError!]!
 }
